@@ -235,10 +235,10 @@ public class ShowBytecodeOutlineAction extends AnAction {
   private void updateToolWindowContents(final Project project, final VirtualFile file) {
     ApplicationManager.getApplication().runWriteAction(() -> {
       if (file == null) {
-        BytecodeOutline.getInstance(project).setCode(file, Constants.NO_CLASS_FOUND);
-        BytecodeASMified.getInstance(project).setCode(file, Constants.NO_CLASS_FOUND);
-        GroovifiedView.getInstance(project).setCode(file, Constants.NO_CLASS_FOUND);
-        CfrDecompile.getInstance(project).setCode(file, Constants.NO_CLASS_FOUND);
+        BytecodeOutline.getInstance(project).setCode(null, Constants.NO_CLASS_FOUND);
+        BytecodeASMified.getInstance(project).setCode(null, Constants.NO_CLASS_FOUND);
+        GroovifiedView.getInstance(project).setCode(null, Constants.NO_CLASS_FOUND);
+        CfrDecompile.getInstance(project).setCode(null, Constants.NO_CLASS_FOUND);
         ToolWindowManager.getInstance(project).getToolWindow("ASM").activate(null);
         return;
       }

@@ -81,7 +81,6 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
      * 只需要一个方法调用即可
      */
     protected void setupUI() {
-        System.out.println("执行setui");
 
         final EditorFactory editorFactory = EditorFactory.getInstance();
         document = editorFactory.createDocument("");
