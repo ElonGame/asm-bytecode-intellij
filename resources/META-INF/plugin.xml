@@ -1,11 +1,16 @@
 <idea-plugin version="2">
 	<name>ASM Bytecode Outline</name>
 	<description>Displays bytecode for Java classes and ASMified code which will help you in your class generation.</description>
-	<version>0.3.5</version>
+	<version>1.3.5</version>
 	<vendor>Cédric Champeau</vendor>
 	<idea-version since-build="103.14"/>
 
     <change-notes><![CDATA[
+    	<b>Version 1.3.5</b>
+        <ul>
+            <li>增加cfr反编译</li>
+            <li>fix 代码风格,自用</li>
+        </ul>
         <b>Version 0.3.5</b>
         <ul>
             <li>Fixed ASM lib classes version</li>
@@ -52,7 +57,7 @@
 
 	<project-components>
         <component>
-            <implementation-class>org.objectweb.asm.idea.config.ASMPluginComponent</implementation-class>
+            <implementation-class>org.objectweb.asm.idea.ui.ASMPluginComponent</implementation-class>
         </component>
     </project-components>
 
@@ -68,12 +73,14 @@
 
 	<extensions defaultExtensionNs="com.intellij">
 		<toolWindow id="ASM" anchor="right" icon="/images/asm.gif"
-					factoryClass="org.objectweb.asm.idea.BytecodeOutlineToolWindowFactory"/>
-		<projectService serviceInterface="org.objectweb.asm.idea.BytecodeOutline"
-						serviceImplementation="org.objectweb.asm.idea.BytecodeOutline"/>
-		<projectService serviceInterface="org.objectweb.asm.idea.BytecodeASMified"
-						serviceImplementation="org.objectweb.asm.idea.BytecodeASMified"/>
-        <projectService serviceInterface="org.objectweb.asm.idea.GroovifiedView"
-                        serviceImplementation="org.objectweb.asm.idea.GroovifiedView"/>
+					factoryClass="org.objectweb.asm.idea.service.BytecodeOutlineToolWindowFactory"/>
+		<projectService serviceInterface="org.objectweb.asm.idea.service.BytecodeOutline"
+						serviceImplementation="org.objectweb.asm.idea.service.BytecodeOutline"/>
+		<projectService serviceInterface="org.objectweb.asm.idea.service.BytecodeASMified"
+						serviceImplementation="org.objectweb.asm.idea.service.BytecodeASMified"/>
+        <projectService serviceInterface="org.objectweb.asm.idea.service.GroovifiedView"
+                        serviceImplementation="org.objectweb.asm.idea.service.GroovifiedView"/>
+        <projectService serviceInterface="org.objectweb.asm.idea.service.CfrDecompile"
+                        serviceImplementation="org.objectweb.asm.idea.service.CfrDecompile"/>
 	</extensions>
 </idea-plugin>

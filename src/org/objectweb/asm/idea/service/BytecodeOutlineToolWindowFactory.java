@@ -16,12 +16,11 @@
  * /
  */
 
-package org.objectweb.asm.idea;
+package org.objectweb.asm.idea.service;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.ContentFactory;
 
 /**
@@ -29,11 +28,15 @@ import com.intellij.ui.content.ContentFactory;
  */
 public class BytecodeOutlineToolWindowFactory implements ToolWindowFactory{
 	public void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
+
 		BytecodeOutline outline = BytecodeOutline.getInstance(project);
 		BytecodeASMified asmified = BytecodeASMified.getInstance(project);
-        GroovifiedView groovified = GroovifiedView.getInstance(project);
+        	GroovifiedView groovified = GroovifiedView.getInstance(project);
+		CfrDecompile cfrDecompile = CfrDecompile.getInstance(project);
+
 		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(outline, "Bytecode", false));
 		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(asmified, "ASMified", false));
 		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(groovified, "Groovified", false));
+		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(cfrDecompile, "cfrDecompile", false));
 	}
 }

@@ -16,15 +16,14 @@
  * /
  */
 
-package org.objectweb.asm.idea;
+package org.objectweb.asm.idea.service;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 
-import javax.swing.*;
-import java.awt.*;
+import org.objectweb.asm.idea.ACodeView;
 
 
 /**
@@ -35,15 +34,15 @@ import java.awt.*;
  */
 
 /**
- * ASMified code view.
+ * The groovified view displays @groovyx.ast.bytecode.Bytecode code for methods.
  */
-public class BytecodeASMified extends ACodeView {
+public class GroovifiedView extends ACodeView {
 
-	public BytecodeASMified(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
-		super(toolWindowManager, keymapManager, project);
+	public GroovifiedView(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+		super(toolWindowManager, keymapManager, project, "groovy");
 	}
 
-	public static BytecodeASMified getInstance(Project project) {
-		return ServiceManager.getService(project, BytecodeASMified.class);
+	public static GroovifiedView getInstance(Project project) {
+		return ServiceManager.getService(project, GroovifiedView.class);
 	}
 }

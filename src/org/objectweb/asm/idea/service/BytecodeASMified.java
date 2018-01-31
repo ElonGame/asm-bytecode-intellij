@@ -16,20 +16,14 @@
  * /
  */
 
-package org.objectweb.asm.idea;
+package org.objectweb.asm.idea.service;
 
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComponentContainer;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
-import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import org.objectweb.asm.idea.ACodeView;
 
 
 /**
@@ -40,15 +34,15 @@ import java.awt.*;
  */
 
 /**
- * Bytecode view.
+ * ASMified code view.
  */
-public class BytecodeOutline extends ACodeView {
+public class BytecodeASMified extends ACodeView {
 
-	public BytecodeOutline(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+	public BytecodeASMified(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
 		super(toolWindowManager, keymapManager, project);
 	}
 
-	public static BytecodeOutline getInstance(Project project) {
-		return ServiceManager.getService(project, BytecodeOutline.class);
+	public static BytecodeASMified getInstance(Project project) {
+		return ServiceManager.getService(project, BytecodeASMified.class);
 	}
 }

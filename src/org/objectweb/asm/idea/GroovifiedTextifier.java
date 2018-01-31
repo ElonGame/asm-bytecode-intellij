@@ -24,7 +24,7 @@ package org.objectweb.asm.idea;
  * Time: 22:07
  */
 
-import org.objectweb.asm.idea.config.GroovyCodeStyle;
+import org.objectweb.asm.idea.ui.GroovyCodeStyle;
 
 import reloc.org.objectweb.asm.Label;
 import reloc.org.objectweb.asm.Opcodes;

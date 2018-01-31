@@ -27,29 +27,21 @@ package org.objectweb.asm.idea;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.diff.DiffContent;
-import com.intellij.openapi.diff.DiffManager;
-import com.intellij.openapi.diff.DiffRequest;
-import com.intellij.openapi.diff.SimpleContent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.keymap.KeymapManager;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.PopupHandler;
 
-import org.objectweb.asm.idea.config.ASMPluginComponent;
+import org.objectweb.asm.idea.action.ShowDiffAction;
+import org.objectweb.asm.idea.action.ShowSettingsAction;
+import org.objectweb.asm.idea.constant.Constants;
 
 import java.awt.BorderLayout;
 
@@ -60,20 +52,17 @@ import javax.swing.JPanel;
  * Base class for editors which displays bytecode or ASMified code.
  */
 public class ACodeView extends SimpleToolWindowPanel implements Disposable {
-    private static final String DIFF_WINDOW_TITLE = "Show differences from previous class contents";
-    private static final String[] DIFF_TITLES = {"Previous version", "Current version"};
-    protected final Project project;
+    private final Project project;
 
-    protected final ToolWindowManager toolWindowManager;
-    protected final KeymapManager keymapManager;
+    private final ToolWindowManager toolWindowManager;
+    private final KeymapManager keymapManager;
     private final String extension;
 
+    // diff view
+    private ShowDiffAction diffAction;
 
-    protected Editor editor;
-    protected Document document;
-    // used for diff view
-    private String previousCode;
-    private VirtualFile previousFile;
+    private Editor editor;
+    private Document document;
 
     public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project, final String fileExtension) {
         super(true, true);
@@ -81,24 +70,29 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         this.keymapManager = keymapManager;
         this.project = project;
         this.extension = fileExtension;
-        setupUI();
+        this.setupUI();
     }
 
-    public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
+    public  ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
         this(toolWindowManager, keymapManager, project, "java");
     }
 
-    private void setupUI() {
+    /**
+     * 只需要一个方法调用即可
+     */
+    protected void setupUI() {
+        System.out.println("执行setui");
+
         final EditorFactory editorFactory = EditorFactory.getInstance();
         document = editorFactory.createDocument("");
         editor = editorFactory.createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension(extension), true);
 
         final JComponent editorComponent = editor.getComponent();
         add(editorComponent);
-        final AnAction diffAction = createShowDiffAction();
+        this.diffAction = new ShowDiffAction(project,document);
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(diffAction);
-        group.add(new ShowSettingsAction());
+        group.add(new ShowSettingsAction(project));
         
         final ActionManager actionManager = ActionManager.getInstance();
         final ActionToolbar actionToolBar = actionManager.createActionToolbar("ASM", group, true);
@@ -110,17 +104,17 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
 
     public void setCode(final VirtualFile file, final String code) {
         final String text = document.getText();
-        if (previousFile == null || file == null || previousFile.getPath().equals(file.getPath()) && !Constants.NO_CLASS_FOUND.equals(text)) {
-            if (file != null) {
-                previousCode = text;
+        if (!Constants.NO_CLASS_FOUND.equals(text)) {
+            if (!this.diffAction.isSameFile(file)) {
+                this.diffAction.setPreviousCode(text);
+            } else {
+                this.diffAction.setPreviousCode("");
             }
-        } else if (!previousFile.getPath().equals(file.getPath())) {
-            previousCode = ""; // reset previous code
+        }
+        if (file != null) {
+            this.diffAction.setPreviousFile(file);
         }
         document.setText(code);
-        if (file != null) {
-            previousFile = file;
-        }
     }
 
 
@@ -133,69 +127,5 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         }
     }
 
-    private AnAction createShowDiffAction() {
-        return new ShowDiffAction();
-    }
 
-    private class ShowSettingsAction extends AnAction {
-
-        private ShowSettingsAction() {
-            super("Settings", "Show settings for ASM plugin", IconLoader.getIcon("/general/projectSettings.png"));
-        }
-
-        @Override
-        public boolean displayTextInToolbar() {
-            return true;
-        }
-
-        @Override
-        public void actionPerformed(final AnActionEvent e) {
-            ShowSettingsUtil.getInstance().showSettingsDialog(project, project.getComponent(ASMPluginComponent.class));
-        }
-    }
-    private class ShowDiffAction extends AnAction {
-
-        public ShowDiffAction() {
-            super("Show differences",
-                    "Shows differences from the previous version of bytecode for this file",
-                    IconLoader.getIcon("/actions/diffWithCurrent.png"));
-        }
-
-        @Override
-        public void update(final AnActionEvent e) {
-            e.getPresentation().setEnabled(!"".equals(previousCode) && (previousFile!=null));
-        }
-
-        @Override
-        public boolean displayTextInToolbar() {
-            return true;
-        }
-
-        @Override
-        public void actionPerformed(final AnActionEvent e) {
-            DiffManager.getInstance().getDiffTool().show(new DiffRequest(project) {
-                @Override
-                public DiffContent[] getContents() {
-                    // there must be a simpler way to obtain the file type
-                    PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText("asm." + extension, "");
-                    final DiffContent currentContent = previousFile == null ? new SimpleContent("") : new SimpleContent(document.getText(), psiFile.getFileType());
-                    final DiffContent oldContent = new SimpleContent(previousCode == null ? "" : previousCode, psiFile.getFileType());
-                    return new DiffContent[]{
-                            oldContent,
-                            currentContent
-                    };
-                }
-
-                @Override
-                public String[] getContentTitles() {
-                    return DIFF_TITLES;
-                }
-
-                @Override
-                public String getWindowTitle() {
-                    return DIFF_WINDOW_TITLE;
-                }
-            });
-        }
-    }
 }

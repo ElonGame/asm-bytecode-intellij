@@ -15,25 +15,18 @@
  *  limitations under the License.
  * /
  */
+package org.objectweb.asm.idea.constant;
 
-package org.objectweb.asm.idea.config;
 /**
  * Created by IntelliJ IDEA.
  * User: cedric
  * Date: 18/01/11
- * Time: 22:37
+ * Time: 06:58
  */
 
 /**
- * Enumeration of Groovy code styles
+ * Constants used in various places of the code.
  */
-public enum GroovyCodeStyle {
-    LEGACY("Legacy bytecode"),
-    GROOVIFIER_0_2_0("Groovified bytecode");
-
-    String label;
-
-    GroovyCodeStyle(final String label) {
-        this.label = label;
-    }
+public abstract class Constants {
+    public final static String NO_CLASS_FOUND = "// couldn't generate bytecode view, no .class file found";
 }

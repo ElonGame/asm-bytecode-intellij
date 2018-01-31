@@ -16,7 +16,7 @@
  * /
  */
 
-package org.objectweb.asm.idea.config;
+package org.objectweb.asm.idea.ui;
 /**
  * Created by IntelliJ IDEA.
  * User: cedric
