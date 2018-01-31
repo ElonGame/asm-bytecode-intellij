@@ -58,7 +58,7 @@
 
 	<actions>
 		<action id="showBytecodeOutline" class="org.objectweb.asm.idea.ShowBytecodeOutlineAction"
-				text="Show Bytecode outline"
+				text="Show Bytecode outline-dev"
 				description="Shows the bytecode outline and ASMified code from the current class">
 			<add-to-group group-id="EditorPopupMenu" anchor="last"/>
 			<add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>

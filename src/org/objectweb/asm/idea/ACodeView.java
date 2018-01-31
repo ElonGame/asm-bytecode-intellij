@@ -25,7 +25,11 @@ package org.objectweb.asm.idea;
  */
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.diff.DiffContent;
 import com.intellij.openapi.diff.DiffManager;
 import com.intellij.openapi.diff.DiffRequest;
@@ -44,13 +48,13 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.PopupHandler;
+
 import org.objectweb.asm.idea.config.ASMPluginComponent;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.BorderLayout;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
  * Base class for editors which displays bytecode or ASMified code.
@@ -107,16 +111,20 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     public void setCode(final VirtualFile file, final String code) {
         final String text = document.getText();
         if (previousFile == null || file == null || previousFile.getPath().equals(file.getPath()) && !Constants.NO_CLASS_FOUND.equals(text)) {
-            if (file != null) previousCode = text;
+            if (file != null) {
+                previousCode = text;
+            }
         } else if (!previousFile.getPath().equals(file.getPath())) {
             previousCode = ""; // reset previous code
         }
         document.setText(code);
-        if (file != null) previousFile = file;
+        if (file != null) {
+            previousFile = file;
+        }
     }
 
 
-
+    @Override
     public void dispose() {
         if (editor != null) {
             final EditorFactory editorFactory = EditorFactory.getInstance();

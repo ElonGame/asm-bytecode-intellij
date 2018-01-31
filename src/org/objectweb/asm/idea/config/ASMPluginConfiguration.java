@@ -18,14 +18,20 @@
 
 package org.objectweb.asm.idea.config;
 
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.EnumComboBoxModel;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 import java.util.EnumMap;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 public class ASMPluginConfiguration {
     protected static final String COMPONENT_NAME = "ASMPluginConfiguration";
@@ -84,6 +90,7 @@ public class ASMPluginConfiguration {
             }
         }
 
+        @Override
         public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
             return labels.get(value);
         }

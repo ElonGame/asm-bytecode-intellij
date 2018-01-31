@@ -24,14 +24,14 @@ package org.objectweb.asm.idea;
  * Time: 22:07
  */
 
-import org.objectweb.asm.*;
-import reloc.org.objectweb.asm.*;
+import org.objectweb.asm.idea.config.GroovyCodeStyle;
+
 import reloc.org.objectweb.asm.Label;
 import reloc.org.objectweb.asm.Opcodes;
 import reloc.org.objectweb.asm.Type;
 import reloc.org.objectweb.asm.commons.Method;
-import org.objectweb.asm.idea.config.GroovyCodeStyle;
-import reloc.org.objectweb.asm.util.*;
+import reloc.org.objectweb.asm.util.Printer;
+import reloc.org.objectweb.asm.util.Textifier;
 
 import java.util.Collections;
 import java.util.HashMap;

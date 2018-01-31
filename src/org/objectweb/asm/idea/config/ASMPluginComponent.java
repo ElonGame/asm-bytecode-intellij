@@ -32,11 +32,13 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
+
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 
 /**
  * A component created just to be able to configure the plugin.
@@ -62,9 +64,11 @@ public class ASMPluginComponent implements ProjectComponent, Configurable, Persi
         this.project = project;
     }
 
+    @Override
     public void projectOpened() {
     }
 
+    @Override
     public void projectClosed() {
     }
 
