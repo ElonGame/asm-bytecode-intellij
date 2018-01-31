@@ -1,7 +1,5 @@
 package org.objectweb.asm.idea.cfr;
 
-import com.intellij.util.ReflectionUtil;
-
 import org.benf.cfr.reader.Main;
 import org.benf.cfr.reader.api.ClassFileSource;
 import org.benf.cfr.reader.bytecode.analysis.types.JavaTypeInstance;
@@ -82,15 +80,6 @@ public class CfrPluginRunner {
 
   public String getDecompilationFor(String classFilePath) {
     try {
-      // 清理缓存
-      if (classFilePath.endsWith(".class")) {
-        final String className = classFilePath.substring(classFilePath.lastIndexOf('/')+1);
-        final Map fileCache = ReflectionUtil.getField(DCCommonState.class, this.dcCommonState, Map.class, "classFileCache");
-        if (fileCache != null) {
-          fileCache.remove(className);
-        }
-      }
-
       StringBuilder output = new StringBuilder();
       DumperFactory dumperFactory = new CfrPluginRunner.PluginDumperFactory(output);
       Main.doClass(this.dcCommonState, classFilePath, dumperFactory);

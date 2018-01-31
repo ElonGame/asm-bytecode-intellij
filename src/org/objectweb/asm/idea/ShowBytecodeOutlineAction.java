@@ -223,8 +223,6 @@ public class ShowBytecodeOutlineAction extends AnAction {
   }
 
 
-  private CfrPluginRunner runner = new CfrPluginRunner();
-
   /**
    * Reads the .class file, processes it through the ASM TraceVisitor and ASMifier to update the contents of the two
    * tabs of the tool window.
@@ -272,8 +270,9 @@ public class ShowBytecodeOutlineAction extends AnAction {
       PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText("asm.java", stringWriter.toString());
       CodeStyleManager.getInstance(project).reformat(psiFile);
       BytecodeASMified.getInstance(project).setCode(file, psiFile.getText());
-      // 第四个解析
-      final String decompilation = runner.getDecompilationFor(file.getPath());
+
+      // 第四个解析,内部实现有缓存,所以直接new一个
+      final String decompilation = new CfrPluginRunner().getDecompilationFor(file.getPath());
       CfrDecompile.getInstance(project).setCode(file, decompilation);
       // 激活窗口
       ToolWindowManager.getInstance(project).getToolWindow("ASM").activate(null);
