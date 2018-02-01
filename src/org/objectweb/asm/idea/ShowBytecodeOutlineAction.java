@@ -24,9 +24,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileScope;
-import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -53,7 +51,8 @@ import org.objectweb.asm.idea.service.BytecodeASMified;
 import org.objectweb.asm.idea.service.BytecodeOutline;
 import org.objectweb.asm.idea.service.CfrDecompile;
 import org.objectweb.asm.idea.service.GroovifiedView;
-import org.objectweb.asm.idea.ui.ASMPluginComponent;
+import org.objectweb.asm.idea.ui.GroovyCodeStyle;
+import org.objectweb.asm.idea.util.Settings;
 
 import reloc.org.objectweb.asm.ClassReader;
 import reloc.org.objectweb.asm.ClassVisitor;
@@ -74,6 +73,12 @@ import java.util.concurrent.Semaphore;
  * @author Cédric Champeau
  */
 public class ShowBytecodeOutlineAction extends AnAction {
+
+  private static Settings settings;
+
+  static {
+    settings = Settings.getInstance();
+  }
 
   @Override
   public void update(final AnActionEvent e) {
@@ -114,57 +119,40 @@ public class ShowBytecodeOutlineAction extends AnAction {
         //默认处理
       } else {
         final Application application = ApplicationManager.getApplication();
-        application.runWriteAction(new Runnable() {
-          public void run() {
-            FileDocumentManager.getInstance().saveAllDocuments();
+        application.runWriteAction(() -> FileDocumentManager.getInstance().saveAllDocuments());
+        application.executeOnPooledThread(() -> {
+          final CompileScope compileScope = compilerManager.createFilesCompileScope(files);
+          final VirtualFile[] result = {null};
+          final VirtualFile[] outputDirectories = cme == null ? null : cme.getOutputRoots(true);
+          final Semaphore semaphore = new Semaphore(1);
+          try {
+            semaphore.acquire();
+          } catch (InterruptedException e1) {
+            result[0] = null;
           }
-        });
-        application.executeOnPooledThread(new Runnable() {
-          public void run() {
-            final CompileScope compileScope = compilerManager.createFilesCompileScope(files);
-            final VirtualFile[] result = {null};
-            final VirtualFile[] outputDirectories = cme == null ? null : cme.getOutputRoots(true);
-            final Semaphore semaphore = new Semaphore(1);
+          if (outputDirectories != null && compilerManager.isUpToDate(compileScope)) {
+            application.invokeLater(() -> {
+              result[0] = findClassFile(outputDirectories, psiFile);
+              semaphore.release();
+            });
+          } else {
+            application.invokeLater(() -> compilerManager.compile(files,
+                (aborted, errors, warnings, compileContext) -> {
+                  if (errors == 0) {
+                    VirtualFile[] outputDirectories1 = cme.getOutputRoots(true);
+                    if (outputDirectories1 != null) {
+                      result[0] = findClassFile(outputDirectories1, psiFile);
+                    }
+                  }
+                  semaphore.release();
+                }));
             try {
               semaphore.acquire();
             } catch (InterruptedException e1) {
               result[0] = null;
             }
-            if (outputDirectories != null && compilerManager.isUpToDate(compileScope)) {
-              application.invokeLater(new Runnable() {
-                public void run() {
-                  result[0] = findClassFile(outputDirectories, psiFile);
-                  semaphore.release();
-                }
-              });
-            } else {
-              application.invokeLater(new Runnable() {
-                public void run() {
-                  compilerManager.compile(files, new CompileStatusNotification() {
-                    public void finished(boolean aborted, int errors, int warnings, final CompileContext compileContext) {
-                      if (errors == 0) {
-                        VirtualFile[] outputDirectories = cme.getOutputRoots(true);
-                        if (outputDirectories != null) {
-                          result[0] = findClassFile(outputDirectories, psiFile);
-                        }
-                      }
-                      semaphore.release();
-                    }
-                  });
-                }
-              });
-              try {
-                semaphore.acquire();
-              } catch (InterruptedException e1) {
-                result[0] = null;
-              }
-            }
-            application.invokeLater(new Runnable() {
-              public void run() {
-                updateToolWindowContents(project, result[0]);
-              }
-            });
           }
+          application.invokeLater(() -> updateToolWindowContents(project, result[0]));
         });
       }
     }
@@ -250,18 +238,18 @@ public class ShowBytecodeOutlineAction extends AnAction {
         return;
       }
       int flags = 0;
-      final ASMPluginComponent config = project.getComponent(ASMPluginComponent.class);
-      if (config.isSkipDebug()) flags = flags | ClassReader.SKIP_DEBUG;
-      if (config.isSkipFrames()) flags = flags | ClassReader.SKIP_FRAMES;
-      if (config.isExpandFrames()) flags = flags | ClassReader.EXPAND_FRAMES;
-      if (config.isSkipCode()) flags = flags | ClassReader.SKIP_CODE;
+      if (settings.isSkipDebug()) flags = flags | ClassReader.SKIP_DEBUG;
+      if (settings.isSkipFrames()) flags = flags | ClassReader.SKIP_FRAMES;
+      if (settings.isExpandFrames()) flags = flags | ClassReader.EXPAND_FRAMES;
+      if (settings.isSkipCode()) flags = flags | ClassReader.SKIP_CODE;
 
       reader.accept(visitor, flags);
       //第一个解析
       BytecodeOutline.getInstance(project).setCode(file, stringWriter.toString());
       stringWriter.getBuffer().setLength(0);
       // 第二个解析
-      reader.accept(new TraceClassVisitor(null, new GroovifiedTextifier(config.getCodeStyle()), new PrintWriter(stringWriter)), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+      reader.accept(new TraceClassVisitor(null, new GroovifiedTextifier(GroovyCodeStyle.valueOf(settings.getCodeStyle())),
+          new PrintWriter(stringWriter)), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
       GroovifiedView.getInstance(project).setCode(file, stringWriter.toString());
       //第三个解析
       stringWriter.getBuffer().setLength(0);
@@ -272,7 +260,7 @@ public class ShowBytecodeOutlineAction extends AnAction {
       BytecodeASMified.getInstance(project).setCode(file, psiFile.getText());
 
       // 第四个解析,内部实现有缓存,所以直接new一个
-      final String decompilation = new CfrPluginRunner().getDecompilationFor(file.getPath());
+      final String decompilation = CfrPluginRunner.compile((file.getPath() + " " + settings.getCfrParams()).split(" "));
       CfrDecompile.getInstance(project).setCode(file, decompilation);
       // 激活窗口
       ToolWindowManager.getInstance(project).getToolWindow("ASM").activate(null);

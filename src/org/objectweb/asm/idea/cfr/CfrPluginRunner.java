@@ -8,9 +8,7 @@ import org.benf.cfr.reader.state.ClassFileSourceImpl;
 import org.benf.cfr.reader.state.DCCommonState;
 import org.benf.cfr.reader.state.TypeUsageInformation;
 import org.benf.cfr.reader.util.DecompilerCommentSource;
-import org.benf.cfr.reader.util.Functional;
-import org.benf.cfr.reader.util.MapFactory;
-import org.benf.cfr.reader.util.functors.UnaryFunction;
+import org.benf.cfr.reader.util.getopt.GetOptParser;
 import org.benf.cfr.reader.util.getopt.Options;
 import org.benf.cfr.reader.util.getopt.OptionsImpl;
 import org.benf.cfr.reader.util.output.Dumper;
@@ -21,83 +19,35 @@ import org.benf.cfr.reader.util.output.NopSummaryDumper;
 import org.benf.cfr.reader.util.output.StreamDumper;
 import org.benf.cfr.reader.util.output.SummaryDumper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Quding Ding
  * @since 2018/1/31
  */
 public class CfrPluginRunner {
-  private final DCCommonState dcCommonState;
-  private final IllegalIdentifierDump illegalIdentifierDump;
-  private final ClassFileSource classFileSource;
 
-  public CfrPluginRunner() {
-    this(MapFactory.newMap(), (ClassFileSource)null);
-  }
-
-  public CfrPluginRunner(Map<String, String> options) {
-    this(options, (ClassFileSource)null);
-  }
-
-  public CfrPluginRunner(Map<String, String> options, ClassFileSource classFileSource) {
-    this.illegalIdentifierDump = new IllegalIdentifierDump.Nop();
-    this.dcCommonState = initDCState(options, classFileSource);
-    this.classFileSource = classFileSource;
-  }
-
-  public Options getOptions() {
-    return this.dcCommonState.getOptions();
-  }
-
-  public List<List<String>> addJarPaths(String[] jarPaths) {
-    List<List<String>> res = new ArrayList<>();
-    String[] arr$ = jarPaths;
-    int len$ = jarPaths.length;
-
-    for(int i$ = 0; i$ < len$; ++i$) {
-      String jarPath = arr$[i$];
-      res.add(this.addJarPath(jarPath));
-    }
-
-    return res;
-  }
-
-  public List<String> addJarPath(String jarPath) {
+  public static String compile(String[] args) {
+    GetOptParser getOptParser = new GetOptParser();
+    Options options = null;
     try {
-      List<JavaTypeInstance> types = this.dcCommonState.explicitlyLoadJar(jarPath);
-      return Functional.map(types, new UnaryFunction<JavaTypeInstance, String>() {
-        public String invoke(JavaTypeInstance arg) {
-          return arg.getRawName();
-        }
-      });
-    } catch (Exception var3) {
-      return new ArrayList<>(1);
+      options = (Options) getOptParser.parse(args, OptionsImpl.getFactory());
+    } catch (Exception e) {
+      getOptParser.showHelp(OptionsImpl.getFactory(), e);
+      return "params parse fail" + e.getMessage();
     }
-  }
-
-  public String getDecompilationFor(String classFilePath) {
-    try {
-      StringBuilder output = new StringBuilder();
+    StringBuilder output = new StringBuilder();
+    if (!options.optionIsSet(OptionsImpl.HELP) && options.getOption(OptionsImpl.FILENAME) != null) {
+      ClassFileSource classFileSource = new ClassFileSourceImpl(options);
+      DCCommonState dcCommonState = new DCCommonState(options, classFileSource);
+      String path = (String) options.getOption(OptionsImpl.FILENAME);
       DumperFactory dumperFactory = new CfrPluginRunner.PluginDumperFactory(output);
-      Main.doClass(this.dcCommonState, classFilePath, dumperFactory);
+      // 解析
+      Main.doClass(dcCommonState, path, dumperFactory);
       return output.toString();
-    } catch (Exception var4) {
-      return var4.toString();
     }
+    return "decompile fail";
   }
 
-  private static DCCommonState initDCState(Map<String, String> optionsMap, ClassFileSource classFileSource) {
-    OptionsImpl options = new OptionsImpl(null, null, optionsMap);
-    if (classFileSource == null) {
-      classFileSource = new ClassFileSourceImpl(options);
-    }
-    return new DCCommonState(options, classFileSource);
-  }
-
-  private class PluginDumperFactory implements DumperFactory {
+  public static class PluginDumperFactory implements DumperFactory {
     private final StringBuilder outBuffer;
 
     public PluginDumperFactory(StringBuilder out) {
@@ -105,7 +55,7 @@ public class CfrPluginRunner {
     }
 
     public Dumper getNewTopLevelDumper(Options options, JavaTypeInstance classType, SummaryDumper summaryDumper, TypeUsageInformation typeUsageInformation, IllegalIdentifierDump illegalIdentifierDump) {
-      return CfrPluginRunner.this.new StringStreamDumper(this.outBuffer, typeUsageInformation, options);
+      return new StringStreamDumper(this.outBuffer, typeUsageInformation, options);
     }
 
     public SummaryDumper getSummaryDumper(Options options) {
@@ -113,11 +63,11 @@ public class CfrPluginRunner {
     }
   }
 
-  class StringStreamDumper extends StreamDumper {
+  private static class StringStreamDumper extends StreamDumper {
     private final StringBuilder stringBuilder;
 
     public StringStreamDumper(StringBuilder sb, TypeUsageInformation typeUsageInformation, Options options) {
-      super(typeUsageInformation, options, CfrPluginRunner.this.illegalIdentifierDump);
+      super(typeUsageInformation, options, new IllegalIdentifierDump.Nop());
       this.stringBuilder = sb;
     }
 

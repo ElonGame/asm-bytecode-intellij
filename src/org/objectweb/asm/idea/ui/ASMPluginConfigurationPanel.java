@@ -21,8 +21,11 @@ package org.objectweb.asm.idea.ui;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.EnumComboBoxModel;
 
+import org.objectweb.asm.idea.util.Settings;
+
 import java.awt.Component;
 import java.util.EnumMap;
+import java.util.Objects;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JCheckBox;
@@ -31,51 +34,60 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
-public class ASMPluginConfiguration {
-    protected static final String COMPONENT_NAME = "ASMPluginConfiguration";
+public class ASMPluginConfigurationPanel {
     private JPanel contentPane;
     private JCheckBox skipDebugCheckBox;
     private JCheckBox skipFramesCheckBox;
     private JCheckBox skipCodeCheckBox;
     private JCheckBox expandFramesCheckBox;
     private JComboBox groovyCodeStyleComboBox;
+    private JTextField cfrParams;
+    private JLabel CfrLabel;
 
-    public ASMPluginConfiguration() {
+    public ASMPluginConfigurationPanel() {
     }
 
     public JComponent getRootPane() {
         return contentPane;
     }
 
-    public void setData(ASMPluginComponent data) {
+    public void setData(Settings data) {
         skipDebugCheckBox.setSelected(data.isSkipDebug());
         skipFramesCheckBox.setSelected(data.isSkipFrames());
         skipCodeCheckBox.setSelected(data.isSkipCode());
         expandFramesCheckBox.setSelected(data.isExpandFrames());
         groovyCodeStyleComboBox.setSelectedItem(data.getCodeStyle());
+        cfrParams.setText(data.getCfrParams());
     }
 
-    public void getData(ASMPluginComponent data) {
+    public void getData(Settings data) {
         data.setSkipDebug(skipDebugCheckBox.isSelected());
         data.setSkipFrames(skipFramesCheckBox.isSelected());
         data.setSkipCode(skipCodeCheckBox.isSelected());
         data.setExpandFrames(expandFramesCheckBox.isSelected());
-        data.setCodeStyle((GroovyCodeStyle) groovyCodeStyleComboBox.getSelectedItem());
+        if (groovyCodeStyleComboBox.getSelectedItem() != null) {
+            data.setCodeStyle(groovyCodeStyleComboBox.getSelectedItem().toString());
+        } else {
+            data.setCodeStyle(GroovyCodeStyle.LEGACY.toString());
+        }
+        data.setCfrParams(cfrParams.getText());
     }
 
-    public boolean isModified(ASMPluginComponent data) {
+    public boolean isModified(Settings data) {
         if (skipDebugCheckBox.isSelected() != data.isSkipDebug()) return true;
         if (skipFramesCheckBox.isSelected() != data.isSkipFrames()) return true;
         if (skipCodeCheckBox.isSelected() != data.isSkipCode()) return true;
         if (expandFramesCheckBox.isSelected() != data.isExpandFrames()) return true;
-        if (!groovyCodeStyleComboBox.getSelectedItem().equals(data.getCodeStyle())) return true;
+        if (!Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), data.getCodeStyle())) return true;
+        if (!cfrParams.getText().equals(data.getCfrParams())) return true;
         return false;
     }
 
     private void createUIComponents() {
-        ComboBoxModel model = new EnumComboBoxModel<GroovyCodeStyle>(GroovyCodeStyle.class);
+        ComboBoxModel model = new EnumComboBoxModel<>(GroovyCodeStyle.class);
         groovyCodeStyleComboBox = new ComboBox(model);
         groovyCodeStyleComboBox.setRenderer(new GroovyCodeStyleCellRenderer());
     }
@@ -84,7 +96,7 @@ public class ASMPluginConfiguration {
         private EnumMap<GroovyCodeStyle, JLabel> labels;
 
         private GroovyCodeStyleCellRenderer() {
-            labels = new EnumMap<GroovyCodeStyle, JLabel>(GroovyCodeStyle.class);
+            labels = new EnumMap<>(GroovyCodeStyle.class);
             for (GroovyCodeStyle codeStyle : GroovyCodeStyle.values()) {
                 labels.put(codeStyle, new JLabel(codeStyle.label));
             }

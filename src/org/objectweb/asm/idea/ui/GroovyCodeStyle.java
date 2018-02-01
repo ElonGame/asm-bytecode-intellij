@@ -28,8 +28,8 @@ package org.objectweb.asm.idea.ui;
  * Enumeration of Groovy code styles
  */
 public enum GroovyCodeStyle {
-    LEGACY("Legacy bytecode"),
-    GROOVIFIER_0_2_0("Groovified bytecode");
+    LEGACY("Legacy_bytecode"),
+    GROOVIFIER_0_2_0("Groovified_bytecode");
 
     String label;
 

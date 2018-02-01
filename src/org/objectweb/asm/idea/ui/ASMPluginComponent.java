@@ -24,18 +24,12 @@ package org.objectweb.asm.idea.ui;
  * Time: 19:51
  */
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 
-import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.idea.util.Settings;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -43,81 +37,20 @@ import javax.swing.JComponent;
 /**
  * A component created just to be able to configure the plugin.
  */
-@State(
-        name = ASMPluginConfiguration.COMPONENT_NAME,
-        storages = {
-                @Storage(id = "other", file = "$PROJECT_FILE$")
-        }
-)
-public class ASMPluginComponent implements ProjectComponent, Configurable, PersistentStateComponent<Element> {
+public class ASMPluginComponent implements Configurable,Disposable {
 
-    private Project project;
-    private boolean skipFrames = false;
-    private boolean skipDebug = false;
-    private boolean skipCode = false;
-    private boolean expandFrames = false;
-    private GroovyCodeStyle codeStyle = GroovyCodeStyle.LEGACY;
+    private Settings settings;
 
-    private ASMPluginConfiguration configDialog;
+    private ASMPluginConfigurationPanel configDialog;
 
-    public ASMPluginComponent(final Project project) {
-        this.project = project;
-    }
-
-    @Override
-    public void projectOpened() {
-    }
-
-    @Override
-    public void projectClosed() {
-    }
-
-    @NotNull
-    public String getComponentName() {
-        return "ASM Plugin";
-    }
-
-    public void initComponent() {
-    }
-
-    public void disposeComponent() {
-    }
-
-    public boolean isSkipCode() {
-        return skipCode;
-    }
-
-    public void setSkipCode(final boolean skipCode) {
-        this.skipCode = skipCode;
-    }
-
-    public boolean isSkipDebug() {
-        return skipDebug;
-    }
-
-    public void setSkipDebug(final boolean skipDebug) {
-        this.skipDebug = skipDebug;
-    }
-
-    public boolean isSkipFrames() {
-        return skipFrames;
-    }
-
-    public void setSkipFrames(final boolean skipFrames) {
-        this.skipFrames = skipFrames;
-    }
-
-    public GroovyCodeStyle getCodeStyle() {
-        return codeStyle;
-    }
-
-    public void setCodeStyle(final GroovyCodeStyle codeStyle) {
-        this.codeStyle = codeStyle;
+    public ASMPluginComponent() {
+        settings = Settings.getInstance();
     }
 
     // -------------- Configurable interface implementation --------------------------
 
     @Nls
+    @Override
     public String getDisplayName() {
         return "ASM Bytecode plugin";
     }
@@ -126,78 +59,45 @@ public class ASMPluginComponent implements ProjectComponent, Configurable, Persi
         return IconLoader.getIcon("/images/asm.gif");
     }
 
+    @Override
     public String getHelpTopic() {
         return null;
     }
 
+    @Override
     public JComponent createComponent() {
-        if (configDialog==null) configDialog = new ASMPluginConfiguration();
+        if (configDialog==null) configDialog = new ASMPluginConfigurationPanel();
         return configDialog.getRootPane();
     }
 
+    @Override
     public boolean isModified() {
-        return configDialog!=null && configDialog.isModified(this);
+        return configDialog!=null && configDialog.isModified(settings);
     }
 
-    public void apply() throws ConfigurationException {
+    @Override
+    public void apply() {
         if (configDialog!=null) {
-            configDialog.getData(this);
+            configDialog.getData(settings);
         }
     }
 
+    @Override
     public void reset() {
         if (configDialog!=null) {
-            configDialog.setData(this);
+            configDialog.setData(settings);
         }
     }
 
+    @Override
     public void disposeUIResources() {
         configDialog = null;
     }
 
-    public boolean isExpandFrames() {
-        return expandFrames;
+    @Override
+    public void dispose() {
+        this.configDialog = null;
     }
-
-    public void setExpandFrames(final boolean expandFrames) {
-        this.expandFrames = expandFrames;
-    }
-
-    // -------------------- state persistence
-
-    public Element getState() {
-        Element root = new Element("state");
-        Element asmNode = new Element("asm");
-        asmNode.setAttribute("skipDebug", String.valueOf(skipDebug));
-        asmNode.setAttribute("skipFrames", String.valueOf(skipFrames));
-        asmNode.setAttribute("skipCode", String.valueOf(skipCode));
-        asmNode.setAttribute("expandFrames", String.valueOf(expandFrames));
-        root.addContent(asmNode);
-        Element groovyNode = new Element("groovy");
-        groovyNode.setAttribute("codeStyle", codeStyle.toString());
-        root.addContent(groovyNode);
-        return root;
-    }
-
-    public void loadState(final Element state) {
-        Element asmNode = state.getChild("asm");
-        if (asmNode!=null) {
-            final String skipDebugStr = asmNode.getAttributeValue("skipDebug");
-            if (skipDebugStr!=null) skipDebug= Boolean.valueOf(skipDebugStr);
-            final String skipFramesStr = asmNode.getAttributeValue("skipFrames");
-            if (skipFramesStr!=null) skipFrames= Boolean.valueOf(skipFramesStr);
-            final String skipCodeStr = asmNode.getAttributeValue("skipCode");
-            if (skipCodeStr!=null) skipCode = Boolean.valueOf(skipCodeStr);
-            final String expandFramesStr = asmNode.getAttributeValue("expandFrames");
-            if (expandFramesStr!=null) expandFrames = Boolean.valueOf(expandFramesStr);
-        }
-        Element groovyNode = state.getChild("groovy");
-        if (groovyNode!=null) {
-            String codeStyleStr = groovyNode.getAttributeValue("codeStyle");
-            if (codeStyleStr!=null) codeStyle = GroovyCodeStyle.valueOf(codeStyleStr);
-        }
-    }
-
 }
 
 

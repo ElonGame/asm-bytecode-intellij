@@ -40,7 +40,6 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.PopupHandler;
 
 import org.objectweb.asm.idea.action.ShowDiffAction;
-import org.objectweb.asm.idea.action.ShowSettingsAction;
 import org.objectweb.asm.idea.constant.Constants;
 
 import java.awt.BorderLayout;
@@ -64,7 +63,8 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     private Editor editor;
     private Document document;
 
-    public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project, final String fileExtension) {
+    public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager,
+        final Project project, final String fileExtension) {
         super(true, true);
         this.toolWindowManager = toolWindowManager;
         this.keymapManager = keymapManager;
@@ -91,8 +91,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         this.diffAction = new ShowDiffAction(project,document);
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(diffAction);
-        group.add(new ShowSettingsAction(project));
-        
+
         final ActionManager actionManager = ActionManager.getInstance();
         final ActionToolbar actionToolBar = actionManager.createActionToolbar("ASM", group, true);
         final JPanel buttonsPanel = new JPanel(new BorderLayout());
