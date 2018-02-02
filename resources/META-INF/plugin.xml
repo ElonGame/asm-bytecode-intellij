@@ -1,11 +1,16 @@
 <idea-plugin>
 	<name>ASM Bytecode Outline</name>
 	<description>Displays bytecode for Java classes and ASMified code which will help you in your class generation.</description>
-	<version>1.3.5</version>
+	<version>1.3.6</version>
 	<vendor>Cédric Champeau</vendor>
 	<idea-version since-build="171"/>
 
     <change-notes><![CDATA[
+    	<b>Version 1.3.6</b>
+        <ul>
+            <li>整理UI相关代码,提出配置类</li>
+            <li>CFR decompile增加参数配置,详细参数可以见官网</li>
+        </ul>
     	<b>Version 1.3.5</b>
         <ul>
             <li>增加cfr反编译</li>

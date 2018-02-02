@@ -1,5 +1,11 @@
 This file was created by IntelliJ IDEA 10.0.1 for binding GitHub repository
 
+### 2018.2.2
+1. 加入cfr配置参数,参数格式为 `--decodelambdas true --decodestringswitch false`,与cfr官方一致
+2. 进一步整理代码,配置与UI分离.
+3. 改动太大,应该不会提pull request了
+
+
 ### 2018.1.31
 fork后加入了cfr反编译结果,个人认为观感更加方便,题主最近在学kotlin,配合反编译更快的掌握kotlin.
 
