@@ -16,7 +16,7 @@
  * /
  */
 
-package org.objectweb.asm.idea;
+package org.objectweb.asm.idea.service;
 /**
  * Created by IntelliJ IDEA.
  * User: cedric
@@ -24,7 +24,7 @@ package org.objectweb.asm.idea;
  * Time: 22:07
  */
 
-import org.objectweb.asm.idea.ui.GroovyCodeStyle;
+import org.objectweb.asm.idea.constant.GroovyCodeStyle;
 
 import reloc.org.objectweb.asm.Label;
 import reloc.org.objectweb.asm.Opcodes;

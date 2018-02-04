@@ -73,7 +73,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         this.setupUI();
     }
 
-    public  ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
+    public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
         this(toolWindowManager, keymapManager, project, "java");
     }
 

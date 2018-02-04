@@ -16,7 +16,7 @@
  * /
  */
 
-package org.objectweb.asm.idea.ui;
+package org.objectweb.asm.idea.constant;
 /**
  * Created by IntelliJ IDEA.
  * User: cedric
@@ -31,7 +31,7 @@ public enum GroovyCodeStyle {
     LEGACY("Legacy_bytecode"),
     GROOVIFIER_0_2_0("Groovified_bytecode");
 
-    String label;
+    public String label;
 
     GroovyCodeStyle(final String label) {
         this.label = label;

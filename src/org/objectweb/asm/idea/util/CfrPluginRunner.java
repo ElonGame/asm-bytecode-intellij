@@ -1,4 +1,4 @@
-package org.objectweb.asm.idea.cfr;
+package org.objectweb.asm.idea.util;
 
 import org.benf.cfr.reader.Main;
 import org.benf.cfr.reader.api.ClassFileSource;
@@ -7,7 +7,6 @@ import org.benf.cfr.reader.entities.Method;
 import org.benf.cfr.reader.state.ClassFileSourceImpl;
 import org.benf.cfr.reader.state.DCCommonState;
 import org.benf.cfr.reader.state.TypeUsageInformation;
-import org.benf.cfr.reader.util.DecompilerCommentSource;
 import org.benf.cfr.reader.util.getopt.GetOptParser;
 import org.benf.cfr.reader.util.getopt.Options;
 import org.benf.cfr.reader.util.getopt.OptionsImpl;
@@ -19,66 +18,70 @@ import org.benf.cfr.reader.util.output.NopSummaryDumper;
 import org.benf.cfr.reader.util.output.StreamDumper;
 import org.benf.cfr.reader.util.output.SummaryDumper;
 
+import java.io.StringWriter;
+
 /**
  * @author Quding Ding
  * @since 2018/1/31
  */
 public class CfrPluginRunner {
 
-  public static String compile(String[] args) {
+  public static void compile(String[] args,StringWriter writer) {
     GetOptParser getOptParser = new GetOptParser();
     Options options = null;
     try {
-      options = (Options) getOptParser.parse(args, OptionsImpl.getFactory());
+      options = getOptParser.parse(args, OptionsImpl.getFactory());
     } catch (Exception e) {
       getOptParser.showHelp(OptionsImpl.getFactory(), e);
-      return "params parse fail" + e.getMessage();
+      writer.append("params parse fail").append(e.getMessage());
     }
-    StringBuilder output = new StringBuilder();
     if (!options.optionIsSet(OptionsImpl.HELP) && options.getOption(OptionsImpl.FILENAME) != null) {
       ClassFileSource classFileSource = new ClassFileSourceImpl(options);
       DCCommonState dcCommonState = new DCCommonState(options, classFileSource);
-      String path = (String) options.getOption(OptionsImpl.FILENAME);
-      DumperFactory dumperFactory = new CfrPluginRunner.PluginDumperFactory(output);
+      String path = options.getOption(OptionsImpl.FILENAME);
+      DumperFactory dumperFactory = new CfrPluginRunner.PluginDumperFactory(writer);
       // 解析
       Main.doClass(dcCommonState, path, dumperFactory);
-      return output.toString();
+      return;
     }
-    return "decompile fail";
+    writer.append("decompile fail");
   }
 
   public static class PluginDumperFactory implements DumperFactory {
-    private final StringBuilder outBuffer;
+    private final StringWriter outBuffer;
 
-    public PluginDumperFactory(StringBuilder out) {
+    public PluginDumperFactory(StringWriter out) {
       this.outBuffer = out;
     }
 
-    public Dumper getNewTopLevelDumper(Options options, JavaTypeInstance classType, SummaryDumper summaryDumper, TypeUsageInformation typeUsageInformation, IllegalIdentifierDump illegalIdentifierDump) {
+    public Dumper getNewTopLevelDumper(Options options, JavaTypeInstance classType, SummaryDumper summaryDumper,
+        TypeUsageInformation typeUsageInformation, IllegalIdentifierDump illegalIdentifierDump) {
       return new StringStreamDumper(this.outBuffer, typeUsageInformation, options);
     }
 
     public SummaryDumper getSummaryDumper(Options options) {
-      return (SummaryDumper)(!options.optionIsSet(OptionsImpl.OUTPUT_DIR) ? new NopSummaryDumper() : new FileSummaryDumper((String)options.getOption(OptionsImpl.OUTPUT_DIR), options, (DecompilerCommentSource)null));
+      return !options.optionIsSet(OptionsImpl.OUTPUT_DIR) ?
+          new NopSummaryDumper() : new FileSummaryDumper(options.getOption(OptionsImpl.OUTPUT_DIR), options, null);
     }
   }
 
   private static class StringStreamDumper extends StreamDumper {
-    private final StringBuilder stringBuilder;
+    private final StringWriter writer;
 
-    public StringStreamDumper(StringBuilder sb, TypeUsageInformation typeUsageInformation, Options options) {
+    public StringStreamDumper(StringWriter writer, TypeUsageInformation typeUsageInformation, Options options) {
       super(typeUsageInformation, options, new IllegalIdentifierDump.Nop());
-      this.stringBuilder = sb;
+      this.writer = writer;
     }
 
     protected void write(String s) {
-      this.stringBuilder.append(s);
+      writer.append(s);
     }
 
     public void close() {
     }
 
     public void addSummaryError(Method method, String s) {
+
     }
   }
 }

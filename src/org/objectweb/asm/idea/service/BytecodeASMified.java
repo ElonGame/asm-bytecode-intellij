@@ -21,9 +21,20 @@ package org.objectweb.asm.idea.service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 
 import org.objectweb.asm.idea.ACodeView;
+
+import reloc.org.objectweb.asm.ClassReader;
+import reloc.org.objectweb.asm.util.ASMifier;
+import reloc.org.objectweb.asm.util.TraceClassVisitor;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
@@ -38,11 +49,24 @@ import org.objectweb.asm.idea.ACodeView;
  */
 public class BytecodeASMified extends ACodeView {
 
-	public BytecodeASMified(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
-		super(toolWindowManager, keymapManager, project);
-	}
+  public BytecodeASMified(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
+    super(toolWindowManager, keymapManager, project);
+  }
 
-	public static BytecodeASMified getInstance(Project project) {
-		return ServiceManager.getService(project, BytecodeASMified.class);
-	}
+  public static BytecodeASMified getInstance(Project project) {
+    return ServiceManager.getService(project, BytecodeASMified.class);
+  }
+
+  public void deCompileAndSetCode(Project project, VirtualFile file, StringWriter stringWriter, ClassReader reader, int flags) {
+    //第三个解析
+    stringWriter.getBuffer().setLength(0);
+    try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+      reader.accept(new TraceClassVisitor(null, new ASMifier(), printWriter), flags);
+      PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText("asm.java", stringWriter.toString());
+      CodeStyleManager.getInstance(project).reformat(psiFile);
+      this.setCode(file, psiFile.getText());
+    } catch (Exception e) {
+      this.setCode(file, "decompile fail" + e.getMessage());
+    }
+  }
 }

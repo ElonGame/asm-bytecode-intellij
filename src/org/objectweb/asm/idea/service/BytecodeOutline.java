@@ -21,9 +21,17 @@ package org.objectweb.asm.idea.service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
 
 import org.objectweb.asm.idea.ACodeView;
+
+import reloc.org.objectweb.asm.ClassReader;
+import reloc.org.objectweb.asm.ClassVisitor;
+import reloc.org.objectweb.asm.util.TraceClassVisitor;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
@@ -38,11 +46,17 @@ import org.objectweb.asm.idea.ACodeView;
  */
 public class BytecodeOutline extends ACodeView {
 
-	public BytecodeOutline(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
-		super(toolWindowManager, keymapManager, project);
-	}
+  public BytecodeOutline(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+    super(toolWindowManager, keymapManager, project);
+  }
 
-	public static BytecodeOutline getInstance(Project project) {
-		return ServiceManager.getService(project, BytecodeOutline.class);
-	}
+  public static BytecodeOutline getInstance(Project project) {
+    return ServiceManager.getService(project, BytecodeOutline.class);
+  }
+
+  public void deCompileAndSetCode(VirtualFile file, StringWriter stringWriter, ClassReader reader, int flags) {
+    ClassVisitor visitor = new TraceClassVisitor(new PrintWriter(stringWriter));
+    reader.accept(visitor, flags);
+    this.setCode(file, stringWriter.toString());
+  }
 }

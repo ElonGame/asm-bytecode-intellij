@@ -26,24 +26,22 @@ package org.objectweb.asm.idea.ui;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.util.IconLoader;
 
 import org.jetbrains.annotations.Nls;
 import org.objectweb.asm.idea.util.Settings;
 
-import javax.swing.Icon;
 import javax.swing.JComponent;
 
 /**
  * A component created just to be able to configure the plugin.
  */
-public class ASMPluginComponent implements Configurable,Disposable {
+public class ASMPluginSettingUI implements Configurable,Disposable {
 
     private Settings settings;
 
     private ASMPluginConfigurationPanel configDialog;
 
-    public ASMPluginComponent() {
+    public ASMPluginSettingUI() {
         settings = Settings.getInstance();
     }
 
@@ -53,10 +51,6 @@ public class ASMPluginComponent implements Configurable,Disposable {
     @Override
     public String getDisplayName() {
         return "ASM Bytecode plugin";
-    }
-
-    public Icon getIcon() {
-        return IconLoader.getIcon("/images/asm.gif");
     }
 
     @Override

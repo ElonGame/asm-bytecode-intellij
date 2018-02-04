@@ -41,26 +41,18 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 
-import org.objectweb.asm.idea.cfr.CfrPluginRunner;
 import org.objectweb.asm.idea.constant.Constants;
 import org.objectweb.asm.idea.service.BytecodeASMified;
 import org.objectweb.asm.idea.service.BytecodeOutline;
 import org.objectweb.asm.idea.service.CfrDecompile;
 import org.objectweb.asm.idea.service.GroovifiedView;
-import org.objectweb.asm.idea.ui.GroovyCodeStyle;
 import org.objectweb.asm.idea.util.Settings;
 
 import reloc.org.objectweb.asm.ClassReader;
-import reloc.org.objectweb.asm.ClassVisitor;
-import reloc.org.objectweb.asm.util.ASMifier;
-import reloc.org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Semaphore;
 
@@ -229,7 +221,6 @@ public class ShowBytecodeOutlineAction extends AnAction {
         return;
       }
       StringWriter stringWriter = new StringWriter();
-      ClassVisitor visitor = new TraceClassVisitor(new PrintWriter(stringWriter));
       ClassReader reader = null;
       try {
         file.refresh(false, false);
@@ -243,27 +234,17 @@ public class ShowBytecodeOutlineAction extends AnAction {
       if (settings.isExpandFrames()) flags = flags | ClassReader.EXPAND_FRAMES;
       if (settings.isSkipCode()) flags = flags | ClassReader.SKIP_CODE;
 
-      reader.accept(visitor, flags);
-      //第一个解析
-      BytecodeOutline.getInstance(project).setCode(file, stringWriter.toString());
-      stringWriter.getBuffer().setLength(0);
-      // 第二个解析
-      reader.accept(new TraceClassVisitor(null, new GroovifiedTextifier(GroovyCodeStyle.valueOf(settings.getCodeStyle())),
-          new PrintWriter(stringWriter)), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-      GroovifiedView.getInstance(project).setCode(file, stringWriter.toString());
-      //第三个解析
-      stringWriter.getBuffer().setLength(0);
-      reader.accept(new TraceClassVisitor(null,
-          new ASMifier(), new PrintWriter(stringWriter)), flags);
-      PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText("asm.java", stringWriter.toString());
-      CodeStyleManager.getInstance(project).reformat(psiFile);
-      BytecodeASMified.getInstance(project).setCode(file, psiFile.getText());
-
-      // 第四个解析,内部实现有缓存,所以直接new一个
-      final String decompilation = CfrPluginRunner.compile((file.getPath() + " " + settings.getCfrParams()).split(" "));
-      CfrDecompile.getInstance(project).setCode(file, decompilation);
+      //BytecodeOutline 处理
+      BytecodeOutline.getInstance(project).deCompileAndSetCode(file, stringWriter, reader, flags);
+      //groovify处理
+      GroovifiedView.getInstance(project).deCompileAndSetCode(file, stringWriter, reader);
+      // asmified处理
+      BytecodeASMified.getInstance(project).deCompileAndSetCode(project, file, stringWriter, reader, flags);
+      //cfr处理
+      CfrDecompile.getInstance(project).deCompileAndSetCode(project, file, stringWriter);
       // 激活窗口
       ToolWindowManager.getInstance(project).getToolWindow("ASM").activate(null);
     });
   }
+
 }

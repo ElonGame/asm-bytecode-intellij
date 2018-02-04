@@ -21,6 +21,7 @@ package org.objectweb.asm.idea.ui;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.EnumComboBoxModel;
 
+import org.objectweb.asm.idea.constant.GroovyCodeStyle;
 import org.objectweb.asm.idea.util.Settings;
 
 import java.awt.Component;
@@ -45,7 +46,7 @@ public class ASMPluginConfigurationPanel {
     private JCheckBox expandFramesCheckBox;
     private JComboBox groovyCodeStyleComboBox;
     private JTextField cfrParams;
-    private JLabel CfrLabel;
+    private JLabel cfrLabel;
 
     public ASMPluginConfigurationPanel() {
     }
@@ -59,7 +60,7 @@ public class ASMPluginConfigurationPanel {
         skipFramesCheckBox.setSelected(data.isSkipFrames());
         skipCodeCheckBox.setSelected(data.isSkipCode());
         expandFramesCheckBox.setSelected(data.isExpandFrames());
-        groovyCodeStyleComboBox.setSelectedItem(data.getCodeStyle());
+        groovyCodeStyleComboBox.setSelectedItem(GroovyCodeStyle.valueOf(data.getCodeStyle()));
         cfrParams.setText(data.getCfrParams());
     }
 

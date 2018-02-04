@@ -21,9 +21,18 @@ package org.objectweb.asm.idea.service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
 
 import org.objectweb.asm.idea.ACodeView;
+import org.objectweb.asm.idea.constant.GroovyCodeStyle;
+import org.objectweb.asm.idea.util.Settings;
+
+import reloc.org.objectweb.asm.ClassReader;
+import reloc.org.objectweb.asm.util.TraceClassVisitor;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
@@ -38,11 +47,30 @@ import org.objectweb.asm.idea.ACodeView;
  */
 public class GroovifiedView extends ACodeView {
 
-	public GroovifiedView(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
-		super(toolWindowManager, keymapManager, project, "groovy");
-	}
+  private static Settings settings;
 
-	public static GroovifiedView getInstance(Project project) {
-		return ServiceManager.getService(project, GroovifiedView.class);
-	}
+  static {
+    settings = Settings.getInstance();
+  }
+
+  public GroovifiedView(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+    super(toolWindowManager, keymapManager, project, "groovy");
+  }
+
+  public static GroovifiedView getInstance(Project project) {
+    return ServiceManager.getService(project, GroovifiedView.class);
+  }
+
+  public void deCompileAndSetCode(VirtualFile file, StringWriter stringWriter, ClassReader reader) {
+    // 第二个解析
+    stringWriter.getBuffer().setLength(0);
+    try(PrintWriter printWriter = new PrintWriter(stringWriter)) {
+      reader.accept(new TraceClassVisitor(null,
+          new GroovifiedTextifier(GroovyCodeStyle.valueOf(settings.getCodeStyle())), printWriter),
+          ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+      this.setCode(file, stringWriter.toString());
+    } catch (Exception e) {
+      this.setCode(file, "decompile fail" + e.getMessage());
+    }
+  }
 }

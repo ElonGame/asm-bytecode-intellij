@@ -7,13 +7,13 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.idea.ui.GroovyCodeStyle;
+import org.objectweb.asm.idea.constant.GroovyCodeStyle;
 
 /**
  * @author Quding Ding
  * @since 2018/2/1
  */
-@State(name = "ASMPluginConfigurationPanel", storages = {@Storage("ASMPlugin.xml")})
+@State(name = "ASMPluginConfiguration", storages = {@Storage("ASMPlugin.xml")})
 public class Settings implements PersistentStateComponent<Settings> {
 
   private boolean skipFrames = false;
