@@ -10,6 +10,7 @@ import org.objectweb.asm.idea.ACodeView;
 import org.objectweb.asm.idea.util.CfrPluginRunner;
 import org.objectweb.asm.idea.util.Settings;
 
+import java.io.IOException;
 import java.io.StringWriter;
 
 /**
@@ -35,7 +36,12 @@ public class CfrDecompile extends ACodeView {
   public void deCompileAndSetCode(Project project, VirtualFile file, StringWriter stringWriter) {
     // 第四个解析,内部实现有缓存,所以直接new一个
     stringWriter.getBuffer().setLength(0);
-    CfrPluginRunner.compile((file.getPath() + " " + settings.getCfrParams()).split(" "), stringWriter);
+    try {
+      CfrPluginRunner.compile((file.getPath() + " " + settings.getCfrParams()).split(" "),
+          stringWriter,file.contentsToByteArray(),file.getName());
+    } catch (IOException e) {
+      stringWriter.append("can not load class");
+    }
     this.setCode(file, stringWriter.toString());
   }
 

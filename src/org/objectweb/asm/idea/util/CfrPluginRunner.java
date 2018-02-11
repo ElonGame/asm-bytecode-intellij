@@ -4,7 +4,6 @@ import org.benf.cfr.reader.Main;
 import org.benf.cfr.reader.api.ClassFileSource;
 import org.benf.cfr.reader.bytecode.analysis.types.JavaTypeInstance;
 import org.benf.cfr.reader.entities.Method;
-import org.benf.cfr.reader.state.ClassFileSourceImpl;
 import org.benf.cfr.reader.state.DCCommonState;
 import org.benf.cfr.reader.state.TypeUsageInformation;
 import org.benf.cfr.reader.util.getopt.GetOptParser;
@@ -26,7 +25,7 @@ import java.io.StringWriter;
  */
 public class CfrPluginRunner {
 
-  public static void compile(String[] args,StringWriter writer) {
+  public static void compile(String[] args,StringWriter writer, byte[] classSource,String className) {
     GetOptParser getOptParser = new GetOptParser();
     Options options = null;
     try {
@@ -36,7 +35,7 @@ public class CfrPluginRunner {
       writer.append("params parse fail").append(e.getMessage());
     }
     if (!options.optionIsSet(OptionsImpl.HELP) && options.getOption(OptionsImpl.FILENAME) != null) {
-      ClassFileSource classFileSource = new ClassFileSourceImpl(options);
+      ClassFileSource classFileSource = new ClassByteCodeSourceImpl(options,classSource,className);
       DCCommonState dcCommonState = new DCCommonState(options, classFileSource);
       String path = options.getOption(OptionsImpl.FILENAME);
       DumperFactory dumperFactory = new CfrPluginRunner.PluginDumperFactory(writer);
@@ -46,6 +45,7 @@ public class CfrPluginRunner {
     }
     writer.append("decompile fail");
   }
+
 
   public static class PluginDumperFactory implements DumperFactory {
     private final StringWriter outBuffer;

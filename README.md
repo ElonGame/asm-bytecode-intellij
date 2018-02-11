@@ -1,5 +1,8 @@
 This file was created by IntelliJ IDEA 10.0.1 for binding GitHub repository
 
+### 2018.2.11
+1. crf decompile支持直接查看External Libraries下的jar中的相关类.
+
 ### 2018.2.4
 1. 处理action与具体反编译处理分离
 2. cfr复用stringWriter
