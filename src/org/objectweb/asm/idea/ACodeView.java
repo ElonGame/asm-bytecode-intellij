@@ -40,7 +40,6 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.PopupHandler;
 
 import org.objectweb.asm.idea.action.ShowDiffAction;
-import org.objectweb.asm.idea.constant.Constants;
 
 import java.awt.BorderLayout;
 
@@ -101,17 +100,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     }
 
     public void setCode(final VirtualFile file, final String code) {
-        final String text = document.getText();
-        if (!Constants.NO_CLASS_FOUND.equals(text)) {
-            if (!this.diffAction.isSameFile(file)) {
-                this.diffAction.setPreviousCode(text);
-            } else {
-                this.diffAction.setPreviousCode("");
-            }
-        }
-        if (file != null) {
-            this.diffAction.setPreviousFile(file);
-        }
+        this.diffAction.acceptNewFile(file, code);
         document.setText(code);
     }
 
@@ -122,6 +111,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
             final EditorFactory editorFactory = EditorFactory.getInstance();
             editorFactory.releaseEditor(editor);
             editor = null;
+            this.diffAction = null;
         }
     }
 

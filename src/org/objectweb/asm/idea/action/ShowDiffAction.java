@@ -28,6 +28,8 @@ public class ShowDiffAction extends AnAction {
     private Project project;
 
     private String previousCode;
+    private String currentCode;
+
     private VirtualFile previousFile;
     private Document currentDocument;
 
@@ -60,7 +62,6 @@ public class ShowDiffAction extends AnAction {
     @Override
     public void actionPerformed(final AnActionEvent e) {
         com.intellij.diff.DiffManager.getInstance().showDiff(project, new ContentDiffRequest() {
-            @Nullable
             @Override
             public String getTitle() {
                 return DIFF_WINDOW_TITLE;
@@ -93,12 +94,18 @@ public class ShowDiffAction extends AnAction {
         return this.previousFile.getPath().equals(file.getPath());
     }
 
-    // set函数
-    public void setPreviousCode(String previousCode) {
-        this.previousCode = previousCode;
-    }
-
-    public void setPreviousFile(VirtualFile previousFile) {
-        this.previousFile = previousFile;
+    /**
+     * 接收新的文件
+     */
+    public void acceptNewFile(VirtualFile file,String code) {
+        if (!isSameFile(file)) {
+            this.previousCode = "";
+        } else {
+            this.previousCode = this.currentCode;
+        }
+        if (file != null) {
+            this.previousFile = file;
+            this.currentCode = code;
+        }
     }
 }

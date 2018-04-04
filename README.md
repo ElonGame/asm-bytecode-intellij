@@ -1,5 +1,8 @@
 This file was created by IntelliJ IDEA 10.0.1 for binding GitHub repository
 
+### 2018.4.4
+1. 修复diff功能
+
 ### 2018.2.11
 1. crf decompile支持直接查看External Libraries下的jar中的相关类.
 
