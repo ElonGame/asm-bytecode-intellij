@@ -21,7 +21,10 @@ public class Settings implements PersistentStateComponent<Settings> {
   private boolean skipCode = false;
   private boolean expandFrames = false;
   private String codeStyle = GroovyCodeStyle.LEGACY.toString();
-  private String cfrParams = "";
+  /**
+   * 好多人不会用,因此加上默认参数
+   */
+  private String cfrParams = "--stringbuilder false --arrayiter fase --collectioniter false --decodelambdas false --sugarboxing false";
 
   /**
    * 全局单例
