@@ -29,7 +29,7 @@ This file was created by IntelliJ IDEA 10.0.1 for binding GitHub repository
 ![](http://oobu4m7ko.bkt.clouddn.com/string.png?imageMogr2/thumbnail/!100p)
 
 **--decodestringswitch false**
-![](http://oobu4m7ko.bkt.clouddn.com/switchcase.png?imageMogr2/thumbnail/!100p)
+![](http://oobu4m7ko.bkt.clouddn.com/switchcase.png)
 
 
 ### link
