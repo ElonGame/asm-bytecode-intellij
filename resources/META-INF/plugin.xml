@@ -6,6 +6,10 @@
 	<idea-version since-build="171"/>
 
     <change-notes><![CDATA[
+    	<b>Version 1.4.1</b>
+        <ul>
+            <li>升级cfr131版本</li>
+        </ul>
     	<b>Version 1.4.0</b>
         <ul>
             <li>鉴于好多同学不会用,因此增加cfr默认参数</li>
@@ -48,31 +52,7 @@
         </ul>
         <b>Version 0.3.3</b>
         <ul>
-            <li>Upgraded ASM to 5.0</li>
-        </ul>
-        <b>Version 0.3.2</b>
-        <ul>
-            <li>Upgraded ASM to 4.0</li>
-        </ul>
-        <b>Version 0.3.1</b>
-        <ul>
-            <li>Updated for IntelliJ IDEA 10.0.2</li>
-            <li>Supports showing bytecode for .class files for which we have source code</li>
-        </ul>
-        <b>Version 0.3</b>
-        <ul>
-            <li>Add diff view popup which shows the differences with the previous version of bytecode</li>
-            <li>Search in every output directory, including test files</li>
-            <li>Support for Groovy @groovyx.ast.bytecode.Bytecode annotation</li>
-            <li>Configuration of ASM ClassReader flags</li>
-            <li>Configuration of Groovy code style</li>
-        </ul>
-        <b>Version 0.2</b>
-        <ul>
-            <li>Fixed .class files not being found under Windows</li>
-            <li>Fixed tool window not opening if output directory doesn't exist</li>
-            <li>Added shortcut in "Code" menu</li>
-            <li>Do not compile file if up-to-date</li>
+            <li>.....</li>
         </ul>
     ]]></change-notes>
 
@@ -86,7 +66,7 @@
 
 	<actions>
 		<action id="showBytecodeOutline" class="org.objectweb.asm.idea.ShowBytecodeOutlineAction"
-				text="Show Bytecode outline-dev"
+				text="Show Bytecode outline"
 				description="Shows the bytecode outline and ASMified code from the current class">
 			<add-to-group group-id="EditorPopupMenu" anchor="last"/>
 			<add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>

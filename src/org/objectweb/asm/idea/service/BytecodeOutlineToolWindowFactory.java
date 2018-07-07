@@ -26,17 +26,17 @@ import com.intellij.ui.content.ContentFactory;
 /**
  * ASM ToolWindow factory
  */
-public class BytecodeOutlineToolWindowFactory implements ToolWindowFactory{
-	public void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
+public class BytecodeOutlineToolWindowFactory implements ToolWindowFactory {
+  public void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
 
-		BytecodeOutline outline = BytecodeOutline.getInstance(project);
-		BytecodeASMified asmified = BytecodeASMified.getInstance(project);
-        	GroovifiedView groovified = GroovifiedView.getInstance(project);
-		CfrDecompile cfrDecompile = CfrDecompile.getInstance(project);
+    BytecodeOutline outline = BytecodeOutline.getInstance(project);
+    BytecodeASMified asmified = BytecodeASMified.getInstance(project);
+    GroovifiedView groovified = GroovifiedView.getInstance(project);
+    CfrDecompile cfrDecompile = CfrDecompile.getInstance(project);
 
-		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(outline, "Bytecode", false));
-		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(asmified, "ASMified", false));
-		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(groovified, "Groovified", false));
-		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(cfrDecompile, "cfrDecompile", false));
-	}
+    toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(outline, "Bytecode", false));
+    toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(asmified, "ASMified", false));
+    toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(groovified, "Groovified", false));
+    toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(cfrDecompile, "cfrDecompile", false));
+  }
 }
