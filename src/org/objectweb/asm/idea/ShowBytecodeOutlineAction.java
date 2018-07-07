@@ -94,7 +94,7 @@ public class ShowBytecodeOutlineAction extends AnAction {
       // 定位到所在的模块
       final Module module = ModuleUtil.findModuleForPsiElement(psiFile);
       // 得到编译所在目录信息
-      final CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
+      final CompilerModuleExtension cme = null == module ? null : CompilerModuleExtension.getInstance(module);
       final CompilerManager compilerManager = CompilerManager.getInstance(project);
 
       final VirtualFile[] files = {virtualFile};
