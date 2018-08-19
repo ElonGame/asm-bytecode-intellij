@@ -1,6 +1,5 @@
 package org.objectweb.asm.idea.action;
 
-import com.google.common.collect.Lists;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContentImpl;
 import com.intellij.diff.contents.EmptyContent;
@@ -14,7 +13,6 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +70,10 @@ public class ShowDiffAction extends AnAction {
             public List<DiffContent> getContents() {
                 DiffContent currentContent = new DocumentContentImpl(currentDocument);
                 DiffContent oldContent = previousCode == null ? new EmptyContent() : new DocumentContentImpl(new DocumentImpl(previousCode));
-                return Lists.newArrayList(oldContent, currentContent);
+                List<DiffContent> contents = new ArrayList<>(2);
+                contents.add(currentContent);
+                contents.add(oldContent);
+                return contents;
             }
 
             @NotNull

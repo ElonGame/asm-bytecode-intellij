@@ -6,7 +6,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.idea.constant.GroovyCodeStyle;
 
@@ -93,6 +92,10 @@ public class Settings implements PersistentStateComponent<Settings> {
   }
 
   public void setCfrParams(String cfrParams) {
-    this.cfrParams = StringUtils.trim(cfrParams);
+    if (null == cfrParams) {
+      this.cfrParams = "";
+    } else {
+      this.cfrParams = cfrParams.trim();
+    }
   }
 }

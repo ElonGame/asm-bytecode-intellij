@@ -1,14 +1,15 @@
-<idea-plugin>
-	<name>ASM Bytecode Outline</name>
-	<description>Displays bytecode for Java classes and ASMified code which will help you in your class generation.</description>
-	<version>1.4.0</version>
-	<vendor>Cédric Champeau</vendor>
+<idea-plugin url="https://github.com/mrdear/asm-bytecode-intellij">
+	<id>org.objectweb.asm.idea</id>
+	<name>CFR Decompile</name>
+	<description>decompile Java classes tools base on asm-bytecode-intellij</description>
+	<version>1.4.1</version>
+	<vendor email="niudear@foxmail.com" url="https://github.com/mrdear">quding</vendor>
 	<idea-version since-build="171"/>
 
     <change-notes><![CDATA[
     	<b>Version 1.4.1</b>
         <ul>
-            <li>升级cfr131版本</li>
+            <li>upgrade cfr131</li>
         </ul>
     	<b>Version 1.4.0</b>
         <ul>
