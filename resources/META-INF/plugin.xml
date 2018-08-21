@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/mrdear/asm-bytecode-intellij">
 	<id>org.objectweb.asm.idea</id>
 	<name>CFR Decompile</name>
-	<description>decompile Java classes tools base on asm-bytecode-intellij</description>
+	<description>decompile Java classes tools base on asm-bytecode-intellij-plugin</description>
 	<version>1.4.1</version>
 	<vendor email="niudear@foxmail.com" url="https://github.com/mrdear">quding</vendor>
 	<idea-version since-build="171"/>
@@ -13,33 +13,32 @@
         </ul>
     	<b>Version 1.4.0</b>
         <ul>
-            <li>鉴于好多同学不会用,因此增加cfr默认参数</li>
+            <li>cfr decompile add default params `--stringbuilder false --arrayiter fase --collectioniter false --decodelambdas false --sugarboxing false`</li>
         </ul>
     	<b>Version 1.3.9</b>
         <ul>
-            <li>修复diff</li>
+            <li>fix diff</li>
         </ul>
     	<b>Version 1.3.8</b>
         <ul>
-            <li>crf支持查看External Libraries下的类</li>
+            <li>cfr decompile support `External Libraries` classes</li>
         </ul>
 
     	<b>Version 1.3.7</b>
         <ul>
-            <li>处理action与具体反编译处理分离</li>
-            <li>cfr复用stringWriter</li>
-            <li>修复`groovyCodeStyle`配置显示错误bug</li>
+            <li>1. extract action from old code</li>
+            <li>2. cfr decompile reuse StringWriter</li>
+            <li>3. fix groovyCodeStyle show error</li>
         </ul>
 
     	<b>Version 1.3.6</b>
         <ul>
-            <li>整理UI相关代码,提出配置类</li>
-            <li>CFR decompile增加参数配置,详细参数可以见官网</li>
+            <li>1. cfr decompile parameters can be configured</li>
         </ul>
     	<b>Version 1.3.5</b>
         <ul>
-            <li>增加cfr反编译</li>
-            <li>fix 代码风格,自用</li>
+            <li>1. base on asm-bytecode-intellij and fix code style</li>
+            <li>2. add cfr decompile option</li>
         </ul>
         <b>Version 0.3.5</b>
         <ul>
