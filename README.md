@@ -11,8 +11,10 @@ This file was created by IntelliJ IDEA 10.0.1 for binding GitHub repository
 
 **安装**
 
-1. release中下载最新版本
-2. IDEA `->` plugins `->` install plugin from disk
+方式1. 打来IDEA plugins, 搜索 `CFR` 关键词,下载 `CFR Decompile`
+
+方式2: 打开[https://plugins.jetbrains.com/plugin/11035-cfr-decompile](https://plugins.jetbrains.com/plugin/11035-cfr-decompile),然后下载后手动安装
+
 
 **使用**
 
