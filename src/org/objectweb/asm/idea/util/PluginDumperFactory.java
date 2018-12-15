@@ -1,57 +1,54 @@
 package org.objectweb.asm.idea.util;
 
-import org.benf.cfr.reader.bytecode.analysis.types.JavaTypeInstance;
-import org.benf.cfr.reader.state.TypeUsageInformation;
-import org.benf.cfr.reader.util.getopt.Options;
-import org.benf.cfr.reader.util.getopt.OptionsImpl;
-import org.benf.cfr.reader.util.output.Dumper;
-import org.benf.cfr.reader.util.output.DumperFactory;
-import org.benf.cfr.reader.util.output.FileSummaryDumper;
-import org.benf.cfr.reader.util.output.IllegalIdentifierDump;
-import org.benf.cfr.reader.util.output.NopSummaryDumper;
-import org.benf.cfr.reader.util.output.ProgressDumper;
-import org.benf.cfr.reader.util.output.ProgressDumperNop;
-import org.benf.cfr.reader.util.output.ProgressDumperStdErr;
-import org.benf.cfr.reader.util.output.SummaryDumper;
+import org.benf.cfr.reader.api.OutputSinkFactory;
+import org.benf.cfr.reader.api.SinkReturns;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author Quding Ding
  * @since 2018/7/7
  */
-public class PluginDumperFactory implements DumperFactory {
-  private final StringWriter outBuffer;
-  private final Options options;
-  private final ProgressDumper progressDumper;
+public class PluginDumperFactory implements OutputSinkFactory {
+  /**
+   * 输出路径
+   */
+  private StringWriter writer;
 
+  public PluginDumperFactory(StringWriter writer) {
+    this.writer = writer;
+  }
 
-  public PluginDumperFactory(StringWriter out, Options options) {
-    this.outBuffer = out;
-    this.options = options;
-    if (options.getOption(OptionsImpl.SILENT) || !options.optionIsSet(OptionsImpl.OUTPUT_DIR) && !options.optionIsSet(OptionsImpl.OUTPUT_PATH)) {
-      this.progressDumper = ProgressDumperNop.INSTANCE;
+  @Override
+  public List<SinkClass> getSupportedSinks(SinkType sinkType, Collection<SinkClass> collection) {
+    if (sinkType == SinkType.JAVA && collection.contains(SinkClass.DECOMPILED)) {
+      // I'd like "Decompiled".  If you can't do that, I'll take STRING.
+      return Arrays.asList(SinkClass.DECOMPILED, SinkClass.STRING);
     } else {
-      this.progressDumper = new ProgressDumperStdErr();
+      // I only understand how to sink strings, regardless of what you have to give me.
+      return Collections.singletonList(SinkClass.STRING);
     }
   }
 
-
   @Override
-  public Dumper getNewTopLevelDumper(JavaTypeInstance javaTypeInstance, SummaryDumper summaryDumper,
-      TypeUsageInformation typeUsageInformation, IllegalIdentifierDump illegalIdentifierDump) {
-    return new StringStreamDumper(this.outBuffer, typeUsageInformation, options);
+  public <T> Sink<T> getSink(SinkType sinkType, SinkClass sinkClass) {
+    if (sinkType == SinkType.JAVA && sinkClass == SinkClass.DECOMPILED) {
+      return x -> dumpDecompiled.accept((SinkReturns.Decompiled) x);
+    }
+    if (sinkType == SinkType.EXCEPTION) {
+      return x -> writer.append(((SinkReturns.ExceptionMessage) x).getMessage());
+    }
+    return ignore -> {};
   }
 
-  @Override
-  public ProgressDumper getProgressDumper() {
-    return progressDumper;
-  }
 
-  @Override
-  public SummaryDumper getSummaryDumper() {
-    return !options.optionIsSet(OptionsImpl.OUTPUT_DIR) ?
-        new NopSummaryDumper() : new FileSummaryDumper(options.getOption(OptionsImpl.OUTPUT_DIR), options, null);
-
-  }
+  private Consumer<SinkReturns.Decompiled> dumpDecompiled = d -> {
+    writer.append("Package [").append(d.getPackageName()).append("] Class [").append(d.getClassName()).append("]");
+    writer.append(d.getJava());
+  };
 }

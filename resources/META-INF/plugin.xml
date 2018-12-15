@@ -2,11 +2,15 @@
 	<id>org.objectweb.asm.idea</id>
 	<name>CFR Decompile</name>
 	<description>use cfr decompile Java classes tools base on asm-bytecode-intellij-plugin</description>
-	<version>1.4.2</version>
+	<version>1.4.3</version>
 	<vendor email="niudear@foxmail.com" url="https://github.com/mrdear">quding</vendor>
 	<idea-version since-build="171"/>
 
     <change-notes><![CDATA[
+    	<b>Version 1.4.3</b>
+        <ul>
+            <li>upgrade137</li>
+        </ul>
     	<b>Version 1.4.2</b>
         <ul>
             <li>translate change-notes</li>
